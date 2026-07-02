@@ -7,8 +7,8 @@ export function initSubmarineSimulator(canvas) {
 
   //Start positions
   const VISIBLE_GRID_COLUMNS = 20;
-  const skyHeight = 60; 
-  const bottomHeight = 35; 
+  let skyHeight = 60;
+  let bottomHeight = 50;
 
   let subX = 40;
   let subY = 220; 
@@ -357,6 +357,10 @@ function drawSimulator() {
 
     canvas.width = rect.width;
     canvas.height = rect.height;
+
+    const oneGridRow = canvas.height / 9;
+    skyHeight = oneGridRow * 2;     // 2 rutor himmel
+    bottomHeight = oneGridRow * 1;
 
     const currentHeight = canvas.height || 400;
     

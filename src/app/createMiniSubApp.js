@@ -227,6 +227,137 @@ export function createMiniSubApp(root) {
     return callbacks;
   }
 
+  // RExecutiontrace simulator resize
+  setTimeout(() => {
+    const resizer = root.querySelector("#sidebarResizer");
+    const tracePane = root.querySelector(".trace-pane");
+    const simulatorPanel = root.querySelector(".simulator-panel");
+    const sidebar = root.querySelector(".right-sidebar");
+
+    if (!resizer || !tracePane || !simulatorPanel || !sidebar) {
+      console.error("Kunde inte hitta elementen för att dra panelen!");
+      return;
+    }
+
+    console.log("Dragfunktion aktiverad och redo!");
+
+    let isDragging = false;
+
+    const startDrag = (e) => {
+      isDragging = true;
+      document.body.style.cursor = "ns-resize";
+      document.body.style.userSelect = "none"; // Hindrar text från att markeras på iPad
+    };
+
+    const stopDrag = () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
+    };
+
+    const doDrag = (clientY) => {
+      if (!isDragging) return;
+      
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const relativeY = clientY - sidebarRect.top;
+      
+      let percentage = (relativeY / sidebarRect.height) * 100;
+      if (percentage < 15) percentage = 15;
+      if (percentage > 85) percentage = 85;
+
+      // Skriver över allt i webbläsaren direkt på elementen
+      tracePane.style.setProperty("height", `${percentage}%`, "important");
+      tracePane.style.setProperty("flex", "none", "important");
+      
+      simulatorPanel.style.setProperty("height", `${100 - percentage}%`, "important");
+      simulatorPanel.style.setProperty("flex", "none", "important");
+
+      if (simulator && typeof simulator.resize === "function") {
+        simulator.resize();
+      }
+    };
+
+    // Lyssnare för dator (Mus)
+    resizer.addEventListener("mousedown", startDrag);
+    window.addEventListener("mouseup", stopDrag);
+    window.addEventListener("mousemove", (e) => doDrag(e.clientY));
+
+    // Lyssnare för iPad/Surfplatta (Fingrar)
+    resizer.addEventListener("touchstart", (e) => {
+      startDrag();
+    }, { passive: true });
+    
+    window.addEventListener("touchend", stopDrag);
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches.length > 0) {
+        doDrag(e.touches[0].clientY);
+      }
+    });
+  }, 100); // Väntar 100ms så att HTML hinner ritas ut ordentligt först!
+
+  // Right side bar resize
+  setTimeout(() => {
+    const mainResizer = root.querySelector("#mainWorkspaceResizer");
+    const rightSidebar = root.querySelector(".right-sidebar");
+    const layoutContainer = root.querySelector(".workspace-layout");
+
+    if (mainResizer && rightSidebar && layoutContainer) {
+      let isDraggingWidth = false;
+
+      const startWidthDrag = () => {
+        isDraggingWidth = true;
+        document.body.style.cursor = "ew-resize";
+        document.body.style.userSelect = "none";
+      };
+
+      const stopWidthDrag = () => {
+        if (isDraggingWidth) {
+          isDraggingWidth = false;
+          document.body.style.cursor = "";
+          document.body.style.userSelect = "";
+          // Tvinga Blockly att rita om sig så att blocken inte hamnar utanför skärmen
+          if (workspace) Blockly.svgResize(workspace);
+        }
+      };
+
+      const doWidthDrag = (clientX) => {
+        if (!isDraggingWidth) return;
+
+        const containerRect = layoutContainer.getBoundingClientRect();
+        // Räkna ut hur mycket utrymme som är kvar till höger i pixlar
+        const remainingWidth = containerRect.right - clientX;
+        
+        // Håll sidpanelens bredd inom rimliga gränser (mellan 250px och 70% av skärmen)
+        const minWidth = 250;
+        const maxWidth = containerRect.width * 0.7;
+
+        let newWidth = remainingWidth;
+        if (newWidth < minWidth) newWidth = minWidth;
+        if (newWidth > maxWidth) newWidth = maxWidth;
+
+        rightSidebar.style.setProperty("width", `${newWidth}px`, "important");
+
+        // Säg åt både Blockly och Simulatorn att anpassa sig i realtid
+        if (workspace) Blockly.svgResize(workspace);
+        if (simulator && typeof simulator.resize === "function") simulator.resize();
+      };
+
+      // Muslyssnare
+      mainResizer.addEventListener("mousedown", startWidthDrag);
+      window.addEventListener("mouseup", stopWidthDrag);
+      window.addEventListener("mousemove", (e) => doWidthDrag(e.clientX));
+
+      // Touchlyssnare för iPad
+      mainResizer.addEventListener("touchstart", startWidthDrag, { passive: true });
+      window.addEventListener("touchend", stopWidthDrag);
+      window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) doWidthDrag(e.touches[0].clientX);
+      });
+    }
+  }, 120);
+
   // Simuation and workspace buttons
   startButton.addEventListener("click", async () => {
     if (isExecuting && executionState === "RUNNING") return;

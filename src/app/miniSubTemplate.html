@@ -26,9 +26,10 @@
   .topbar h1 { margin: 0; font-size: 20px; }
   .topbar p.eyebrow { margin: 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
 
+  /* ÄNDRING: Ändrad från grid till flexbox för att dragfunktionen i sidled ska fungera optimalt */
   .workspace-layout {
-    display: grid;
-    grid-template-columns: 1fr 35vw; 
+    display: flex; 
+    width: 100vw;
     height: calc(100vh - 60px);
     overflow: hidden;
   }
@@ -36,8 +37,9 @@
   .workspace-pane {
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #cbd5e1;
     height: 100%;
+    flex: 1;
+    min-width: 200px;
   }
   
   .toolbar {
@@ -57,15 +59,19 @@
     height: 100%;
     background: #f1f5f9;
     overflow: hidden;
+    width: 35vw; /* Startbredd */
+    min-width: 250px;
+    max-width: 70vw;
+    flex-shrink: 0;
   }
 
   .trace-pane {
-    height: 50%;
+    background: #fff;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: #fff;
     border-bottom: 2px solid #cbd5e1;
+    height: 50%; /* Starthöjd */
   }
 
   .trace-entries {
@@ -84,9 +90,21 @@
     background: #fff;
     display: flex;
     flex-direction: column;
-    height: 45%; 
-    flex-shrink: 0;
     overflow: hidden;
+    height: 50%; /* Starthöjd */
+  }
+
+  .simulator-controls {
+    background: #f8fafc; 
+    padding: 6px 10px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid #e2e8f0; 
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   #simulatorCanvas {
@@ -94,6 +112,11 @@
     background: #0284c7;
     width: 100%;
     flex: 1; 
+  }
+
+  /* Hover-effekt för draglisterna */
+  #sidebarResizer:hover, #mainWorkspaceResizer:hover {
+    background: #94a3b8 !important;
   }
 </style>
 
@@ -138,25 +161,30 @@
       <div id="blocklyWorkspace"></div>
     </div>
 
+    <div id="mainWorkspaceResizer" style="width: 8px; background: #cbd5e1; cursor: ew-resize; height: 100%; flex-shrink: 0; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; transition: background 0.1s;"></div>
+
     <div class="right-sidebar">
       <aside class="trace-pane" aria-label="Execution trace">
         <div style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <h2 style="margin: 0; font-size: 13px; color: #334155;">Execution Trace</h2>
-        <button id="clearTraceButton" class="secondary-button" type="button" style="margin: 0;">Clear trace</button>
-      </div>
+          <h2 style="margin: 0; font-size: 13px; color: #334155;">Execution Trace</h2>
+          <button id="clearTraceButton" class="secondary-button" type="button" style="margin: 0;">Clear trace</button>
+        </div>
         <div id="traceEntries" class="trace-entries"></div>
       </aside>
 
+      <div id="sidebarResizer" style="height: 8px; background: #cbd5e1; cursor: ns-resize; width: 100%; flex-shrink: 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; transition: background 0.1s;"></div>
+
       <div class="simulator-panel">
-        <div style="background: #f8fafc; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <button id="startButton" class="quarternary-button" type="button" style="padding: 4px 10px; font-size: 12px;">Start</button>
-            <button id="pauseButton" class="secondary-button" type="button" style="padding: 4px 10px; font-size: 12px;" disabled>Pause</button>
-            <button id="stepButton" class="secondary-button" type="button" style="padding: 4px 10px; font-size: 12px;">Step</button>
-            <button id="stopButton" class="tertiary-button" type="button" style="padding: 4px 10px; font-size: 12px;" disabled>Stop</button>
-            <button id="openSimButton" class="primary-button" type="button" style="padding: 4px 10px; font-size: 12px;">Open Simulation</button>
+        <div class="simulator-controls">
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 1;">
+            <button id="startButton" class="quarternary-button" type="button" style="padding: 8px 12px; font-size: 15px; min-height: auto;">Start</button>
+            <button id="pauseButton" class="secondary-button" type="button" style="padding: 8px 12px; font-size: 15px; min-height: auto;" disabled>Pause</button>
+            <button id="stepButton" class="secondary-button" type="button" style="padding: 8px 12px; font-size: 15px; min-height: auto;">Step</button>
+            <button id="stopButton" class="tertiary-button" type="button" style="padding: 8px 12px; font-size: 15px; min-height: auto;" disabled>Stop</button>
+            <button id="openSimButton" class="primary-button" type="button" style="padding: 8px 12px; font-size: 15px; min-height: auto; white-space: nowrap;">Open Simulation</button>
           </div>
-          <span id="selectionLabel" style="font-size: 11px; color: #64748b;">No block selected</span>
+          
+          <span id="selectionLabel" class="selection-label" style="font-weight: bold; font-size: 11px; color: #475569; white-space: nowrap; flex-shrink: 0; padding-left: 8px; text-align: right;">No block running</span>
         </div>
         <canvas id="simulatorCanvas" width="800" height="400"></canvas>
       </div>
@@ -178,6 +206,7 @@
         <span style="width: 2px; height: 25px; background: #475569; margin: 0 10px;"></span>
         <button id="exitMissionButton" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Exit Simulator</button>
       </div>
+      
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="color: #94a3b8; font-size: 12px; text-transform: uppercase; font-weight: bold;">Executing:</span>
         <span id="modalSelectionLabel" style="background: #334155; color: #38bdf8; padding: 6px 14px; border-radius: 4px; font-family: monospace; font-size: 13px; font-weight: bold; border: 1px solid #475569;">No block running</span>

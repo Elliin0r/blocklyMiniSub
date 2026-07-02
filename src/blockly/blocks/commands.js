@@ -128,7 +128,7 @@ export function registerMiniSubCommandBlocks() {
     },
     {
       type: "minisub_stop",
-      message0: "stop moving",
+      message0: "stop",
       colour: "#E74C3C",
       previousStatement: null,
       nextStatement: null,

@@ -157,34 +157,20 @@ export function createMiniSubApp(root) {
 
           // Make the next block wait
           await new Promise((resolve) => {
-            const checkArrival = setInterval(() => {
+            const seconds = payload.duration_seconds ?? payload.durationSeconds ?? payload.DURATION ?? 1;
+            
+            const checkGameStatus = setInterval(() => {
               const state = simulator.getGameState();
-              
-              const currentX = typeof simulator.getSubX === 'function' ? simulator.getSubX() : 40;
-              const targetX = typeof simulator.getTargetX === 'function' ? simulator.getTargetX() : 40;
-              const currentY = typeof simulator.getSubY === 'function' ? simulator.getSubY() : 40;
-              const targetY = typeof simulator.getTargetY === 'function' ? simulator.getTargetY() : 40;
-
               if (state === "GAMEOVER" || state === "STOPPED") {
-                clearInterval(checkArrival);
+                clearInterval(checkGameStatus);
                 resolve();
-                return;
               }
+            }, 100);
 
-              if (state === "SUCCESS") {
-                clearInterval(checkArrival);
-                resolve();
-                return;
-              }
-
-              const distanceX = Math.abs(currentX - targetX);
-              const distanceY = Math.abs(currentY - targetY);
-
-              if (distanceX < 4.0 && distanceY < 4.0) {
-                clearInterval(checkArrival);
-                resolve(); 
-              }
-            }, 60);
+            setTimeout(() => {
+              clearInterval(checkGameStatus);
+              resolve();
+            }, seconds * 1000);
           });
         }
       },

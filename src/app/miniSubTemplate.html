@@ -112,7 +112,6 @@
         <div class="toolbar-row" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;"> 
           <button id="launchMissionButton" class="primary-button" type="button" style="background: #0284c7; color: #fff; font-weight: bold; padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer;">Launch mission</button>
           <button id="runSelectedButton" class="secondary-button" type="button" disabled>Run selected</button>
-          <button id="clearTraceButton" class="secondary-button" type="button">Clear trace</button>
           <button id="clearWorkspaceButton" class="secondary-button" type="button">Clear board</button>
           <button id="saveWorkspaceButton" class="secondary-button" type="button">Save blocks</button>
           <button id="loadWorkspaceButton" class="secondary-button" type="button">Load blocks</button>
@@ -143,6 +142,7 @@
       <aside class="trace-pane" aria-label="Execution trace">
         <div style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
           <h2 style="margin: 0; font-size: 13px; color: #334155;">Execution Trace</h2>
+          <button id="clearTraceButton" class="secondary-button" type="button">Clear trace</button>
         </div>
         <div id="traceEntries" class="trace-entries"></div>
       </aside>

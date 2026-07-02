@@ -206,6 +206,7 @@ h3 {
   align-items: center;
   border-bottom: 1px solid #d8dee3;
   display: flex;
+  justify-content: space-between; 
   min-height: 45px;
   padding: 0 16px;
   background: #f9f7f2;

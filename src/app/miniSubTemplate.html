@@ -140,10 +140,10 @@
 
     <div class="right-sidebar">
       <aside class="trace-pane" aria-label="Execution trace">
-        <div style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
-          <h2 style="margin: 0; font-size: 13px; color: #334155;">Execution Trace</h2>
-          <button id="clearTraceButton" class="secondary-button" type="button">Clear trace</button>
-        </div>
+        <div style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <h2 style="margin: 0; font-size: 13px; color: #334155;">Execution Trace</h2>
+        <button id="clearTraceButton" class="secondary-button" type="button" style="margin: 0;">Clear trace</button>
+      </div>
         <div id="traceEntries" class="trace-entries"></div>
       </aside>
 
@@ -154,6 +154,7 @@
             <button id="pauseButton" class="secondary-button" type="button" style="padding: 4px 10px; font-size: 12px;" disabled>Pause</button>
             <button id="stepButton" class="secondary-button" type="button" style="padding: 4px 10px; font-size: 12px;">Step</button>
             <button id="stopButton" class="tertiary-button" type="button" style="padding: 4px 10px; font-size: 12px;" disabled>Stop</button>
+            <button id="openSimButton" class="primary-button" type="button" style="padding: 4px 10px; font-size: 12px;">Open Simulation</button>
           </div>
           <span id="selectionLabel" style="font-size: 11px; color: #64748b;">No block selected</span>
         </div>

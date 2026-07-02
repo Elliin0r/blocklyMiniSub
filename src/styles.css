@@ -206,7 +206,6 @@ h3 {
   align-items: center;
   border-bottom: 1px solid #d8dee3;
   display: flex;
-  justify-content: space-between; 
   min-height: 45px;
   padding: 0 16px;
   background: #f9f7f2;
@@ -221,27 +220,22 @@ h3 {
   padding: 14px;
 }
 
-/* --- SÄKRAD SIMULATORPANEL --- */
 .simulator-panel {
   background: #ffffff;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
   flex-direction: column;
   height: 45%; 
   min-height: 200px;
   flex-shrink: 0;
   border-top: 2px solid #d8dee3;
   overflow: hidden; 
-  padding-bottom: 10px;
 }
 
-/* Sparar 55px i höjdled så knapparna inte knuffas ut */
 #simulatorCanvas {
   display: block;
   background: #0284c7;
   width: 100%;
-  height: calc(100% - 55px);
+  height: 100%;
   object-fit: contain; 
 }
 
@@ -297,22 +291,6 @@ h3 {
   padding: 0 14px 14px;
 }
 
-/* --- FIXAT FÖR SIMULATORNS TOUCH-KNAPPAR --- */
-.simulator-controls, .simulation-buttons { 
-  position: relative !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  display: flex !important;
-  flex-direction: row !important; 
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  height: 45px;
-  width: 100%;
-  margin-top: 5px;
-}
-
-/* --- RESPONSIV LAYOUT --- */
 @media (max-width: 920px) {
   .topbar {
     align-items: flex-start;
@@ -362,7 +340,6 @@ h3 {
   }
 }
 
-/* --- SWITCHAR --- */
 .switch-container input:checked + .switch-slider {
     background-color: #4238ce; 
 }
@@ -389,21 +366,4 @@ h3 {
   transition: .3s;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-/* --- ANPASSNING FÖR STÅENDE SURFPLATTA --- */
-@media screen and (orientation: portrait) {
-  #app {
-    display: flex;
-    flex-direction: column; 
-    height: 100vh;
-  }
-  .simulator-panel {
-    height: 35vh !important; 
-    width: 100% !important;
-  }
-  #blocklyWorkspace {
-    height: 65vh !important; 
-    width: 100% !important;
-  }
 }

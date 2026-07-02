@@ -27,6 +27,7 @@ export function createMiniSubApp(root) {
   const pauseButton = root.querySelector("#pauseButton");
   const stepButton = root.querySelector("#stepButton");
   const stopButton = root.querySelector("#stopButton");
+  const openSimButton = root.querySelector("#openSimButton");
 
   const runSelectedButton = root.querySelector("#runSelectedButton");
   const clearTraceButton = root.querySelector("#clearTraceButton");
@@ -82,7 +83,7 @@ export function createMiniSubApp(root) {
 
   renderTracePanel(traceEntries, traceStore.getEntries());
 
-  // How workspace looks and works - UPDATED FOR IPAD TOUCH
+  // How workspace looks and works
   const workspace = Blockly.inject(blocklyHost, {
     toolbox: createToolbox(),
     renderer: "zelos",
@@ -90,8 +91,8 @@ export function createMiniSubApp(root) {
     zoom: { 
       controls: true, 
       wheel: true, 
-      startScale: 1.2,    // 20% larger blocks for fingers
-      maxScale: 3.0,      // Allows deep pinching/zooming
+      startScale: 1.2, 
+      maxScale: 3.0, 
       minScale: 0.4, 
       scaleSpeed: 1.2 
     },
@@ -157,20 +158,34 @@ export function createMiniSubApp(root) {
 
           // Make the next block wait
           await new Promise((resolve) => {
-            const seconds = payload.duration_seconds ?? payload.durationSeconds ?? payload.DURATION ?? 1;
-            
-            const checkGameStatus = setInterval(() => {
+            const checkArrival = setInterval(() => {
               const state = simulator.getGameState();
-              if (state === "GAMEOVER" || state === "STOPPED") {
-                clearInterval(checkGameStatus);
-                resolve();
-              }
-            }, 100);
+              
+              const currentX = typeof simulator.getSubX === 'function' ? simulator.getSubX() : 40;
+              const targetX = typeof simulator.getTargetX === 'function' ? simulator.getTargetX() : 40;
+              const currentY = typeof simulator.getSubY === 'function' ? simulator.getSubY() : 40;
+              const targetY = typeof simulator.getTargetY === 'function' ? simulator.getTargetY() : 40;
 
-            setTimeout(() => {
-              clearInterval(checkGameStatus);
-              resolve();
-            }, seconds * 1000);
+              if (state === "GAMEOVER" || state === "STOPPED") {
+                clearInterval(checkArrival);
+                resolve(); 
+                return;
+              }
+
+              if (state === "SUCCESS") {
+                clearInterval(checkArrival);
+                resolve();
+                return;
+              }
+
+              const distanceX = Math.abs(currentX - targetX);
+              const distanceY = Math.abs(currentY - targetY);
+
+              if (distanceX < 0.5 && distanceY < 0.5) {
+                clearInterval(checkArrival);
+                resolve(); 
+              }
+            }, 50); 
           });
         }
       },
@@ -278,18 +293,25 @@ export function createMiniSubApp(root) {
     }
   });
 
-  // Open a new window
-  launchMissionButton.addEventListener("click", () => {
+launchMissionButton.addEventListener("click", () => {
+    startButton.click();
+  });
+
+  // Open sim window
+    openSimButton.addEventListener("click", () => {
     missionControlModal.style.display = "flex";
-    
     modalCanvasContainer.appendChild(canvas);
     
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.width = modalCanvasContainer.clientWidth;
+    canvas.height = modalCanvasContainer.clientHeight;
+
     setTimeout(() => {
       if (simulator.resize) simulator.resize();
-    }, 40);
+    }, 100);
 
     Blockly.svgResize(workspace);
-
   });
 
   exitMissionButton.addEventListener("click", () => {
